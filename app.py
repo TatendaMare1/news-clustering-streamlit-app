@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-from clustering import cluster_articles, get_top_keywords
+from clustering import cluster_articles, get_top_phrases_for_clusters, preprocess_text # Also ensure preprocess_text is imported if used directly in app.py or load_data()
 
 # Set page config
 st.set_page_config(page_title="News Section Explorer", layout="wide")
