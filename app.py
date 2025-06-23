@@ -8,25 +8,51 @@ from nltk.stem import WordNetLemmatizer
 # CORRECTED IMPORT from clustering.py:
 from clustering import cluster_articles, get_top_keywords, preprocess_text
 
-# --- NLTK Data Download (Cached) ---
+# --- NLTK Data Download (Cached and Managed) ---
 # Use st.cache_resource to download NLTK data only once per app deployment.
 # This ensures the data is available for preprocessing functions.
 @st.cache_resource
 def download_nltk_data():
-    """Downloads necessary NLTK data for text preprocessing."""
+    """
+    Downloads necessary NLTK data for text preprocessing.
+    Forces download to a specific, writable directory within the app's scope.
+    """
+    # Define a local path for NLTK data within the mounted app directory
+    # os.path.dirname(__file__) gives the directory of the current script (app.py)
+    nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+    
+    # Create the directory if it doesn't exist
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path)
+    
+    # Add this custom path to NLTK's data search paths.
+    # This tells NLTK where to look for data.
+    if nltk_data_path not in nltk.data.path:
+        nltk.data.path.append(nltk_data_path)
+        st.info(f"Configuring NLTK data path: {nltk_data_path}")
+
     try:
-        nltk.download('stopwords', quiet=True)
-        nltk.download('wordnet', quiet=True)
-        nltk.download('punkt', quiet=True)
-        # Check if 'omw-1.4' is needed for WordNetLemmatizer, sometimes it is.
-        # If you face a LookupError for 'omw-1.4' later, uncomment the line below.
-        # nltk.download('omw-1.4', quiet=True)
-        st.success("NLTK data downloaded successfully!")
+        st.info("Attempting to download NLTK 'stopwords'...")
+        nltk.download('stopwords', download_dir=nltk_data_path, quiet=True)
+        st.info("Attempting to download NLTK 'wordnet'...")
+        nltk.download('wordnet', download_dir=nltk_data_path, quiet=True)
+        st.info("Attempting to download NLTK 'punkt'...")
+        nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
+        # 'omw-1.4' is often needed by WordNetLemmatizer, so it's good to include
+        st.info("Attempting to download NLTK 'omw-1.4' (for WordNetLemmatizer)...")
+        nltk.download('omw-1.4', download_dir=nltk_data_path, quiet=True)
+
+        st.success("NLTK data downloaded and configured successfully!")
+        return True # Indicate success
     except Exception as e:
-        st.error(f"Failed to download NLTK data: {e}. Please check internet connection or permissions.")
+        st.error(f"Failed to download NLTK data: {e}. "
+                 "Please check internet connection or permissions in the Streamlit Cloud logs.")
+        return False # Indicate failure
 
 # Call the NLTK data download function at the start of your app
-download_nltk_data()
+# Stop the app gracefully if NLTK data download fails
+if not download_nltk_data():
+    st.stop() 
 
 # Set Streamlit page configuration
 st.set_page_config(page_title="News Section Explorer", layout="wide")
