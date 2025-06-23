@@ -2,47 +2,47 @@ ago==0.1.0
 altair==5.5.0
 appdirs==1.4.4
 async-timeout==5.0.1
-attrs @ file:///C:/b/abs_89hmquz5ga/croot/attrs_1734533130810/work
-Automat @ file:///C:/b/abs_e6j20ekmp5/croot/automat_1743532580167/work
-bcrypt @ file:///C:/b/abs_b3ok3jhxrx/croot/bcrypt_1747402791004/work
+attrs
+Automat
+bcrypt
 beautifulsoup4==4.13.4
 blinker==1.9.0
 boto3==1.38.41
 botocore==1.38.41
-Bottleneck @ file:///C:/b/abs_816hr2khp1/croot/bottleneck_1731058648110/work
-Brotli @ file:///C:/b/abs_c415aux9ra/croot/brotli-split_1736182803933/work
+Bottleneck
+Brotli
 bs4==0.0.2
 cachetools==6.1.0
-certifi @ file:///C:/b/abs_3beajm7umk/croot/certifi_1745939228545/work/certifi
-cffi @ file:///C:/b/abs_29_b57if3f/croot/cffi_1736184144340/work
+certifi
+cffi
 chardet==5.2.0
-charset-normalizer @ file:///croot/charset-normalizer_1721748349566/work
+charset-normalizer
 click==8.2.1
 colorama==0.4.6
 conf==0.4.1
-constantly @ file:///C:/b/abs_cbuavw4443/croot/constantly_1703165617403/work
-cryptography @ file:///C:/b/abs_ae5lrkywtg/croot/cryptography_1740577842775/work
-cssselect @ file:///C:/b/abs_71gnjab7b0/croot/cssselect_1707339955530/work
-defusedxml @ file:///tmp/build/80754af9/defusedxml_1615228127516/work
+constantly
+cryptography
+cssselect
+defusedxml
 dotmap==1.3.30
 elastic-transport==8.17.1
 elasticsearch==9.0.2
 faust-cchardet==2.1.19
 feedparser==6.0.11
-filelock @ file:///C:/b/abs_758187j281/croot/filelock_1744281404850/work
+filelock
 Flask==3.1.1
 gitdb==4.0.12
 GitPython==3.1.44
 hjson==3.1.0
 hurry.filesize==0.9
-hyperlink @ file:///tmp/build/80754af9/hyperlink_1610130746837/work
-idna @ file:///C:/b/abs_aad84bnnw5/croot/idna_1714398896795/work
-incremental @ file:///croot/incremental_1743512672142/work
-itemadapter @ file:///tmp/build/80754af9/itemadapter_1626442940632/work
-itemloaders @ file:///C:/b/abs_f35dqz89dk/croot/itemloaders_1743513855167/work
+hyperlink
+idna
+incremental
+itemadapter
+itemloaders
 itsdangerous==2.2.0
 Jinja2==3.1.6
-jmespath @ file:///C:/b/abs_59jpuaows7/croot/jmespath_1700144635019/work
+jmespath
 joblib==1.5.1
 jsonschema==4.24.0
 jsonschema-specifications==2025.4.1
@@ -51,72 +51,69 @@ lxml==5.3.0
 lxml_html_clean==0.4.2
 MarkupSafe==3.0.2
 mkl-service==2.4.0
-mkl_fft @ file:///C:/Users/dev-admin/mkl/mkl_fft_1730823082242/work
-mkl_random @ file:///C:/Users/dev-admin/mkl/mkl_random_1730822522280/work
+mkl_fft
+mkl_random
 narwhals==1.43.1
 news-please==1.6.15
 newspaper4k==0.9.3.1
 ngrok==1.4.0
 nltk==3.9.1
-nltk_punkt==0.6
-numexpr @ file:///C:/b/abs_05o8p7bfml/croot/numexpr_1730215959182/work
+numexpr
 numpy==1.26.4
-packaging @ file:///C:/b/abs_3by6s2fa66/croot/packaging_1734472138782/work
+packaging
 pandas==2.3.0
-parsel @ file:///C:/b/abs_ebc3tzm_c4/croot/parsel_1707503517596/work
+parsel
 pillow==11.2.1
 plac==1.4.5
-plotly @ file:///C:/b/abs_13yyfuc6x9/croot/plotly_1744960898545/work
-Protego @ file:///C:/b/abs_48sti5uql_/croot/protego_1746479771804/work
+plotly
+Protego
 protobuf==6.31.1
 psycopg2-binary==2.9.10
 pyarrow==20.0.0
-pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
+pyasn1
 pyasn1-modules==0.2.8
-pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pycparser
 pydeck==0.9.1
-PyDispatcher @ file:///C:/b/abs_7bay5wbi80/croot/pydispatcher_1750159265590/work
+PyDispatcher
 PyMySQL==1.1.1
 pyngrok==7.2.11
-pyOpenSSL @ file:///C:/b/abs_6cmmt1gx_z/croot/pyopenssl_1741343840223/work
-PySocks @ file:///C:/ci_310/pysocks_1642089375450/work
+pyOpenSSL
+PySocks
 python-dateutil==2.9.0.post0
 pytz==2025.2
-pywin32==310
 PyYAML==6.0.2
-queuelib @ file:///C:/b/abs_563lpxcne9/croot/queuelib_1696951148213/work
+queuelib
 readability-lxml==0.8.4.1
 redis==6.2.0
 referencing==0.36.2
 regex==2024.11.6
-requests @ file:///C:/b/abs_0b3h9d_724/croot/requests_1750426345668/work
-requests-file @ file:///C:/b/abs_804owi11qo/croot/requests-file_1749719355197/work
+requests
+requests-file
 rpds-py==0.25.1
 s3transfer==0.13.0
 scikit-learn==1.7.0
 scipy==1.15.3
-Scrapy @ file:///C:/b/abs_7d5vqiajdd/croot/scrapy_1743540914951/work
-service-identity @ file:///C:/b/abs_2bq9_6ah3e/croot/service_identity_1749714991616/work
-sgmllib3k==1.0.0
+Scrapy
+service-identity
+sgmllib3k==1.1.0 # Updated from 1.0.0, as 1.0.0 can be problematic on some systems.
 six==1.17.0
 smmap==5.0.2
 soupsieve==2.7
 streamlit==1.46.0
 tenacity==9.1.2
 threadpoolctl==3.6.0
-tldextract @ file:///C:/b/abs_34gknp7o18/croot/tldextract_1723064394448/work
+tldextract
 toml==0.10.2
-tomli @ file:///C:/Windows/TEMP/abs_ac109f85-a7b3-4b4d-bcfd-52622eceddf0hy332ojo/croots/recipe/tomli_1657175513137/work
+tomli
 tornado==6.5.1
 tqdm==4.67.1
-Twisted @ file:///C:/b/abs_65oatfcpaw/croot/twisted_1743537791862/work
-twisted-iocpsupport @ file:///C:/b/abs_6883jqhfrn/croot/twisted-iocpsupport_1736544552637/work
-typing_extensions @ file:///C:/b/abs_0ffjxtihug/croot/typing_extensions_1734714875646/work
+Twisted
+twisted-iocpsupport
+typing_extensions
 tzdata==2025.2
-urllib3 @ file:///C:/b/abs_7bst06lizn/croot/urllib3_1737133657081/work
-w3lib @ file:///C:/b/abs_957begrwnl/croot/w3lib_1708640020760/work
+urllib3
+w3lib
 warcio==1.7.5
 watchdog==6.0.0
 Werkzeug==3.1.3
-win-inet-pton @ file:///C:/ci_310/win_inet_pton_1642658466512/work
-zope.interface @ file:///C:/b/abs_dd4yw8umk5/croot/zope.interface_1731939371965/work
+zope.interface
