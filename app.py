@@ -5,22 +5,19 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from collections import Counter
-import requests # Added for manual download
-import zipfile # Added for manual extraction
-import io # Added for in-memory file handling
+import requests
+import zipfile
+import io
 
 # Define a local path for NLTK data within the mounted app directory
-# This path *must* be relative to the app's root on Streamlit Cloud
 NLTK_DATA_DIR = os.path.join(os.path.dirname(__file__), 'nltk_data')
 
 # Set NLTK data path as early as possible
-# This tells NLTK where to look for data.
-# It's crucial to do this *before* any NLTK function that requires data is called.
 if NLTK_DATA_DIR not in nltk.data.path:
     nltk.data.path.append(NLTK_DATA_DIR)
     st.info(f"Configuring NLTK data path: {NLTK_DATA_DIR}")
 
-# Import clustering functions AFTER NLTK data path is set, but BEFORE NLTK functions are used
+# Import clustering functions AFTER NLTK data path is set
 from clustering import cluster_articles, get_top_keywords, preprocess_text
 
 # --- Robust NLTK Data Download and Path Setup ---
@@ -35,17 +32,15 @@ def download_and_check_nltk_data():
         os.makedirs(NLTK_DATA_DIR)
         st.info(f"Created NLTK data directory: {NLTK_DATA_DIR}")
 
-    # Define common NLTK data URL
-    NLTK_DOWNLOAD_URL = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/"
+    # Correct base URL for NLTK data packages
+    NLTK_BASE_DOWNLOAD_URL = "https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/"
 
     # List of NLTK datasets to download and verify
-    # Use direct download for wordnet and omw-1.4 due to past issues
-    # Keep nltk.download for punkt and stopwords as they are usually fine
     datasets = {
         'punkt': {'path': os.path.join(NLTK_DATA_DIR, 'tokenizers', 'punkt'), 'type': 'nltk_download'},
         'stopwords': {'path': os.path.join(NLTK_DATA_DIR, 'corpora', 'stopwords'), 'type': 'nltk_download'},
-        'wordnet': {'path': os.path.join(NLTK_DATA_DIR, 'corpora', 'wordnet'), 'type': 'manual', 'zip_file': 'wordnet.zip'},
-        'omw-1.4': {'path': os.path.join(NLTK_DATA_DIR, 'corpora', 'omw-1.4'), 'type': 'manual', 'zip_file': 'omw-1.4.zip'}
+        'wordnet': {'path': os.path.join(NLTK_DATA_DIR, 'corpora', 'wordnet'), 'type': 'manual', 'zip_subdir': 'corpora', 'zip_file': 'wordnet.zip'},
+        'omw-1.4': {'path': os.path.join(NLTK_DATA_DIR, 'corpora', 'omw-1.4'), 'type': 'manual', 'zip_subdir': 'corpora', 'zip_file': 'omw-1.4.zip'}
     }
 
     all_downloads_successful = True
@@ -57,7 +52,6 @@ def download_and_check_nltk_data():
             st.info(f"NLTK '{dataset}' not found at '{path_to_check}'. Attempting download...")
             try:
                 if download_type == 'nltk_download':
-                    # Use force=True for nltk.download to ensure it tries again
                     nltk.download(dataset, download_dir=NLTK_DATA_DIR, quiet=True, force=True)
                     if os.path.exists(path_to_check):
                         st.success(f"NLTK '{dataset}' downloaded and verified.")
@@ -65,20 +59,21 @@ def download_and_check_nltk_data():
                         st.error(f"NLTK '{dataset}' download completed, but data not found at expected path: {path_to_check}.")
                         all_downloads_successful = False
                 elif download_type == 'manual':
+                    zip_subdir = info['zip_subdir']
                     zip_file_name = info['zip_file']
-                    zip_url = NLTK_DOWNLOAD_URL + zip_file_name
+                    
+                    # Construct the full URL for the zip file
+                    zip_url = f"{NLTK_BASE_DOWNLOAD_URL}{zip_subdir}/{zip_file_name}"
                     
                     st.info(f"Manually downloading '{zip_file_name}' from {zip_url}...")
                     response = requests.get(zip_url, stream=True)
                     response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
 
-                    # Extract directly from memory
+                    # Determine target extraction directory: NLTK_DATA_DIR/corpora
+                    target_dir_for_zip_content = os.path.join(NLTK_DATA_DIR, zip_subdir)
+                    os.makedirs(target_dir_for_zip_content, exist_ok=True) # Ensure corpora dir exists
+
                     with zipfile.ZipFile(io.BytesIO(response.content)) as zf:
-                        # Extract all contents to the NLTK_DATA_DIR/corpora path
-                        # The zip file itself contains 'wordnet' or 'omw-1.4' folder at its root
-                        # So, extracting to NLTK_DATA_DIR/corpora will place it correctly.
-                        target_dir_for_zip_content = os.path.join(NLTK_DATA_DIR, 'corpora')
-                        os.makedirs(target_dir_for_zip_content, exist_ok=True) # Ensure corpora dir exists
                         zf.extractall(target_dir_for_zip_content)
                     
                     if os.path.exists(path_to_check):
@@ -88,7 +83,7 @@ def download_and_check_nltk_data():
                         all_downloads_successful = False
 
             except Exception as e:
-                st.error(f"Failed to download or extract NLTK '{dataset}' data: {e}. App will stop.")
+                st.error(f"Failed to download or extract NLTK '{dataset}' data: {e}. Error: {e}")
                 all_downloads_successful = False
         else:
             st.info(f"NLTK '{dataset}' already present at '{path_to_check}'. Skipping download.")
@@ -106,7 +101,7 @@ if not download_and_check_nltk_data():
 
 
 # Set Streamlit page configuration
-st.set_page_config(page_title="News Section Explorer", layout="wide") # Corrected st.set_page_config to st.set_config
+st.set_page_config(page_title="News Section Explorer", layout="wide")
 
 # --- Data Loading Function (Cached) ---
 @st.cache_data
