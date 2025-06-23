@@ -50,9 +50,6 @@ langdetect==1.0.9
 lxml==5.3.0
 lxml_html_clean==0.4.2
 MarkupSafe==3.0.2
-mkl-service==2.4.0
-mkl_fft
-mkl_random
 narwhals==1.43.1
 news-please==1.6.15
 newspaper4k==0.9.3.1
