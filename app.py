@@ -4,14 +4,10 @@ import os
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from collections import Counter # Make sure Counter is imported if used in get_top_keywords or elsewhere
 
-# CORRECTED IMPORT from clustering.py:
-from clustering import cluster_articles, get_top_keywords, preprocess_text
-
-# --- Robust NLTK Data Download and Path Setup ---
 # Define a local path for NLTK data within the mounted app directory
 # This path *must* be relative to the app's root on Streamlit Cloud
-# os.path.dirname(__file__) gives the directory of the current script (app.py)
 NLTK_DATA_DIR = os.path.join(os.path.dirname(__file__), 'nltk_data')
 
 # Set NLTK data path as early as possible
@@ -21,7 +17,11 @@ if NLTK_DATA_DIR not in nltk.data.path:
     nltk.data.path.append(NLTK_DATA_DIR)
     st.info(f"Configuring NLTK data path: {NLTK_DATA_DIR}")
 
-# Use st.cache_resource to download NLTK data only once per app deployment.
+# Import clustering functions AFTER NLTK data path is set, but BEFORE NLTK functions are used
+# This order is important for NLTK to find its data when functions like preprocess_text are called.
+from clustering import cluster_articles, get_top_keywords, preprocess_text
+
+# --- Robust NLTK Data Download and Path Setup ---
 @st.cache_resource
 def download_and_check_nltk_data():
     """
@@ -33,63 +33,46 @@ def download_and_check_nltk_data():
         os.makedirs(NLTK_DATA_DIR)
         st.info(f"Created NLTK data directory: {NLTK_DATA_DIR}")
 
-    # Check if 'punkt' tokenizer data exists before attempting download
-    # This helps avoid redundant downloads and verifies success
-    punkt_path = os.path.join(NLTK_DATA_DIR, 'tokenizers', 'punkt')
-    if not os.path.exists(punkt_path):
-        try:
-            st.info("NLTK 'punkt' tokenizer not found. Attempting download...")
-            nltk.download('punkt', download_dir=NLTK_DATA_DIR, quiet=True)
-            st.info("NLTK 'punkt' downloaded.")
-        except Exception as e:
-            st.error(f"Failed to download NLTK 'punkt' data: {e}. App will stop.")
-            return False # Indicate failure
+    # List of NLTK datasets to download and verify
+    datasets = {
+        'punkt': os.path.join(NLTK_DATA_DIR, 'tokenizers', 'punkt'),
+        'stopwords': os.path.join(NLTK_DATA_DIR, 'corpora', 'stopwords'),
+        'wordnet': os.path.join(NLTK_DATA_DIR, 'corpora', 'wordnet'),
+        'omw-1.4': os.path.join(NLTK_DATA_DIR, 'corpora', 'omw-1.4') # Often needed by WordNetLemmatizer
+    }
 
-    # Check for other necessary datasets similarly
-    # stopwords
-    stopwords_path = os.path.join(NLTK_DATA_DIR, 'corpora', 'stopwords')
-    if not os.path.exists(stopwords_path):
-        try:
-            st.info("NLTK 'stopwords' not found. Attempting download...")
-            nltk.download('stopwords', download_dir=NLTK_DATA_DIR, quiet=True)
-            st.info("NLTK 'stopwords' downloaded.")
-        except Exception as e:
-            st.error(f"Failed to download NLTK 'stopwords' data: {e}. App will stop.")
-            return False
+    all_downloads_successful = True
+    for dataset, path_to_check in datasets.items():
+        if not os.path.exists(path_to_check):
+            st.info(f"NLTK '{dataset}' not found at '{path_to_check}'. Attempting download...")
+            try:
+                # Use force=True to ensure download, even if NLTK thinks it's there
+                nltk.download(dataset, download_dir=NLTK_DATA_DIR, quiet=True, force=True)
+                if os.path.exists(path_to_check):
+                    st.success(f"NLTK '{dataset}' downloaded and verified.")
+                else:
+                    st.error(f"NLTK '{dataset}' download completed, but data not found at expected path: {path_to_check}. This may indicate a partial or corrupt download.")
+                    all_downloads_successful = False
+            except Exception as e:
+                st.error(f"Failed to download NLTK '{dataset}' data: {e}. App will stop.")
+                all_downloads_successful = False
+        else:
+            st.info(f"NLTK '{dataset}' already present at '{path_to_check}'. Skipping download.")
 
-    # wordnet
-    wordnet_path = os.path.join(NLTK_DATA_DIR, 'corpora', 'wordnet')
-    if not os.path.exists(wordnet_path):
-        try:
-            st.info("NLTK 'wordnet' not found. Attempting download...")
-            nltk.download('wordnet', download_dir=NLTK_DATA_DIR, quiet=True)
-            st.info("NLTK 'wordnet' downloaded.")
-        except Exception as e:
-            st.error(f"Failed to download NLTK 'wordnet' data: {e}. App will stop.")
-            return False
-
-    # omw-1.4 (often required by WordNetLemmatizer)
-    omw_path = os.path.join(NLTK_DATA_DIR, 'corpora', 'omw-1.4')
-    if not os.path.exists(omw_path):
-        try:
-            st.info("NLTK 'omw-1.4' not found. Attempting download...")
-            nltk.download('omw-1.4', download_dir=NLTK_DATA_DIR, quiet=True)
-            st.info("NLTK 'omw-1.4' downloaded.")
-        except Exception as e:
-            st.error(f"Failed to download NLTK 'omw-1.4' data: {e}. App will stop.")
-            return False
-
-    st.success("All required NLTK data is available.")
-    return True # Indicate success
+    if all_downloads_successful:
+        st.success("All required NLTK data is available.")
+        return True
+    else:
+        st.error("One or more NLTK datasets failed to download or verify. Application cannot proceed.")
+        return False
 
 # Call the NLTK data download and check function at the very start of your app logic
 if not download_and_check_nltk_data():
-    st.error("Application cannot proceed due to NLTK data issues.")
     st.stop() # Stop the Streamlit app gracefully if data is not available
 
 
 # Set Streamlit page configuration
-st.set_page_config(page_title="News Section Explorer", layout="wide")
+st.set_config(page_title="News Section Explorer", layout="wide") # Corrected st.set_page_config to st.set_config
 
 # --- Data Loading Function (Cached) ---
 @st.cache_data
@@ -98,9 +81,6 @@ def load_data(csv_path='news.csv'):
     Loads news data from CSV, performs initial preprocessing, and clustering.
     Caches the results to improve app performance.
     """
-    # Ensure news.csv is in the correct path relative to app.py
-    # If news.csv is not in the same directory as app.py, you'll need to adjust csv_path
-    # Example: If news.csv is in a 'data' folder, use 'data/news.csv'
     if not os.path.exists(csv_path):
         st.error(f"Error: The file '{csv_path}' was not found. "
                  "Please ensure 'news.csv' is in the same directory as 'app.py' on GitHub, or update the path.")
@@ -115,7 +95,7 @@ def load_data(csv_path='news.csv'):
         st.stop()
         return pd.DataFrame(), []
 
-    # Perform clustering (which includes preprocessing text)
+    # Call cluster_articles from the clustering.py module
     df, section_names = cluster_articles(df) # cluster_articles now takes df directly
 
     st.success("Data loaded and clustered successfully!")
@@ -129,7 +109,6 @@ def main_app():
     df, section_names = load_data()
 
     if df.empty:
-        # load_data handles errors and stops, but this is a fallback for safety
         st.warning("No data to display. Application stopped or data could not be loaded.")
         return
 
